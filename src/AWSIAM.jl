@@ -14,7 +14,8 @@ __precompile__()
 export iam_whoami,
        iam_create_user, iam_create_access_key,
        iam_delete_access_key, iam_delete_user, iam_put_user_policy,
-       iam_format_policy
+       iam_format_policy,
+       user_arn, role_arn
 
 
 using AWSCore
