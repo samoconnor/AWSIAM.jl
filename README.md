@@ -2,6 +2,8 @@
 
 AWS IAM Interface for Julia
 
+[![Build Status](https://travis-ci.org/samoconnor/AWSIAM.jl.svg)](https://travis-ci.org/samoconnor/AWSIAM.jl)
+
 ```julia
 using AWSIAM
 
