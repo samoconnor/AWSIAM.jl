@@ -7,9 +7,10 @@
 #==============================================================================#
 
 
-module AWSIAM
-
 __precompile__()
+
+
+module AWSIAM
 
 export iam_whoami,
        iam_create_user, iam_create_access_key,
