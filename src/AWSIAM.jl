@@ -12,7 +12,8 @@ __precompile__()
 
 module AWSIAM
 
-export iam_whoami,
+export iam,
+       iam_whoami,
        iam_create_user, iam_create_access_key,
        iam_delete_access_key, iam_delete_user, iam_put_user_policy,
        iam_format_policy,
