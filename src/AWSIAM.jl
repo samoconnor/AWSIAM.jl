@@ -49,7 +49,7 @@ end
 function sts(aws; args...)
 
     do_request(post_request(merge(aws, region = "us-east-1"),
-                            "iam", "2011-06-15", StringDict(args)))
+                            "sts", "2011-06-15", StringDict(args)))
 end
 
 
