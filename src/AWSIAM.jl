@@ -61,11 +61,12 @@ end
 
 function iam_create_user(aws, user_name)
 
-    iam(aws, "CreateUser", Dict("UserName" => user_name))
+    iam(aws, Action = "CreateUser", UserName = user_name)
 
     iam_create_access_key(aws, user_name)
 end
 
+#=
 
 function iam_delete_access_key(aws, user_name)
 
@@ -75,15 +76,17 @@ function iam_delete_access_key(aws, user_name)
     iam(aws, "DeleteAccessKey", Dict("UserName" => user_name, "AccessKeyId" => key))
 end
 
+=#
+
 
 function iam_create_access_key(aws, user_name)
 
-    r = iam(aws, "CreateAccessKey", Dict("UserName" => user_name))
-    r = r["CreateAccessKeyResult"]["AccessKey"]
-    AWSCredentials(r[:AccessKeyId], r[:SecretAccessKey])
+    r = iam(aws, Action = "CreateAccessKey", UserName = user_name)
+    r = r["AccessKey"]
+    AWSCredentials(r["AccessKeyId"], r["SecretAccessKey"])
 end
 
-
+#=
 function iam_delete_user(aws, user_name)
 
     r = iam(aws, "ListUserPolicies", Dict("UserName" => user_name))
@@ -122,6 +125,7 @@ function iam_format_policy(policy_statement)
 #    json [dict create Version 2012-10-17 Statement $policy_statement]
 end
 
+=#
 
 function iam_create_role(aws, name; path="/")
 
