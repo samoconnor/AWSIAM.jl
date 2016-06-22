@@ -48,14 +48,18 @@ end
 
 function sts(aws; args...)
 
-    do_request(post_request(merge(aws, region = "us-east-1"),
-                            "sts", "2011-06-15", StringDict(args)))
+    aws = merge(aws, region = "us-east-1")
+
+    query = StringDict(args)
+    query["ContentType"] = "JSON"
+
+    do_request(post_request(aws, "sts", "2011-06-15", query))
 end
 
 
 function iam_whoami(aws)
 
-    iam(aws, Action = "GetUser")["User"]["Arn"]
+    sts(aws, Action = "GetCallerIdentity")["Arn"]
 end
 
 
