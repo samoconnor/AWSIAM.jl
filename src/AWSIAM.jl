@@ -25,11 +25,11 @@ using Retry
 using SymDict
 
 
-role_arn(aws, role_name) = arn(aws, "iam", "role/$role_name")
-user_arn(aws, user_name) = arn(aws, "iam", "user/$user_name")
+role_arn(aws::AWSConfig, role_name) = arn(aws, "iam", "role/$role_name")
+user_arn(aws::AWSConfig, user_name) = arn(aws, "iam", "user/$user_name")
 
 
-function iam(aws; args...)
+function iam(aws::AWSConfig; args...)
 
     aws = merge(aws, region = "us-east-1")
 
@@ -38,7 +38,7 @@ function iam(aws; args...)
 
     @repeat 4 try
 
-        return do_request(post_request(aws, "iam", "2010-05-08", query))
+        return do_request(post_request(aws::AWSConfig, "iam", "2010-05-08", query))
 
     catch e
         @retry if e.code == "NoSuchEntity" end
@@ -46,20 +46,20 @@ function iam(aws; args...)
 end
 
 
-function sts(aws; args...)
+function sts(aws::AWSConfig; args...)
 
-    do_request(post_request(merge(aws, region = "us-east-1"),
+    do_request(post_request(merge(aws::AWSConfig, region = "us-east-1"),
                             "iam", "2011-06-15", StringDict(args)))
 end
 
 
-function iam_whoami(aws)
+function iam_whoami(aws::AWSConfig)
 
     iam(aws, Action = "GetUser")["User"]["Arn"]
 end
 
 
-function iam_create_user(aws, user_name)
+function iam_create_user(aws::AWSConfig, user_name)
 
     iam(aws, "CreateUser", Dict("UserName" => user_name))
 
@@ -67,7 +67,7 @@ function iam_create_user(aws, user_name)
 end
 
 
-function iam_delete_access_key(aws, user_name)
+function iam_delete_access_key(aws::AWSConfig, user_name)
 
     r = iam(aws, "ListAccessKeys", Dict("UserName" => user_name))
     # ListAccessKeysResult AccessKeyMetadata] {
@@ -76,7 +76,7 @@ function iam_delete_access_key(aws, user_name)
 end
 
 
-function iam_create_access_key(aws, user_name)
+function iam_create_access_key(aws::AWSConfig, user_name)
 
     r = iam(aws, "CreateAccessKey", Dict("UserName" => user_name))
     r = r["CreateAccessKeyResult"]["AccessKey"]
@@ -84,7 +84,7 @@ function iam_create_access_key(aws, user_name)
 end
 
 
-function iam_delete_user(aws, user_name)
+function iam_delete_user(aws::AWSConfig, user_name)
 
     r = iam(aws, "ListUserPolicies", Dict("UserName" => user_name))
 #    for {- policy} in 
@@ -93,7 +93,7 @@ function iam_delete_user(aws, user_name)
                                           "PolicyName" => policy))
 #    }
 
-    iam_delete_access_key(aws, user_name)
+    iam_delete_access_key(aws::AWSConfig, user_name)
 
     r = iam(aws, "ListMFADevices", Dict("UserName" => user_name))
 #    for {- key} in 
@@ -108,7 +108,7 @@ function iam_delete_user(aws, user_name)
 end
 
 
-function iam_put_user_policy(aws, user_name, policy_name, policy)
+function iam_put_user_policy(aws::AWSConfig, user_name, policy_name, policy)
 
     iam(aws, "PutUserPolicy",   
              Dict("UserName" => user_name,
@@ -123,7 +123,7 @@ function iam_format_policy(policy_statement)
 end
 
 
-function iam_create_role(aws, name; path="/")
+function iam_create_role(aws::AWSConfig, name; path="/")
 
     policy = """{
       "Version": "2012-10-17",
