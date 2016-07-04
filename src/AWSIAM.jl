@@ -15,8 +15,6 @@ module AWSIAM
 export iam,
        iam_whoami,
        iam_create_user, iam_create_access_key,
-       iam_delete_access_key, iam_delete_user, iam_put_user_policy,
-       iam_format_policy,
        user_arn, role_arn
 
 
@@ -48,24 +46,27 @@ end
 
 function sts(aws::AWSConfig; args...)
 
-    do_request(post_request(merge(aws::AWSConfig, region = "us-east-1"),
-                            "iam", "2011-06-15", StringDict(args)))
+    query = StringDict(args)
+    query["ContentType"] = "JSON"
+
+    do_request(post_request(aws, "sts", "2011-06-15", query))
 end
 
 
 function iam_whoami(aws::AWSConfig)
 
-    iam(aws, Action = "GetUser")["User"]["Arn"]
+    sts(aws, Action = "GetCallerIdentity")["Arn"]
 end
 
 
 function iam_create_user(aws::AWSConfig, user_name)
 
-    iam(aws, "CreateUser", Dict("UserName" => user_name))
+    iam(aws, Action = "CreateUser", UserName = user_name)
 
     iam_create_access_key(aws, user_name)
 end
 
+#=
 
 function iam_delete_access_key(aws::AWSConfig, user_name)
 
@@ -75,16 +76,18 @@ function iam_delete_access_key(aws::AWSConfig, user_name)
     iam(aws, "DeleteAccessKey", Dict("UserName" => user_name, "AccessKeyId" => key))
 end
 
+=#
+
 
 function iam_create_access_key(aws::AWSConfig, user_name)
 
-    r = iam(aws, "CreateAccessKey", Dict("UserName" => user_name))
-    r = r["CreateAccessKeyResult"]["AccessKey"]
-    AWSCredentials(r[:AccessKeyId], r[:SecretAccessKey])
+    r = iam(aws, Action = "CreateAccessKey", UserName = user_name)
+    r = r["AccessKey"]
+    AWSCredentials(r["AccessKeyId"], r["SecretAccessKey"])
 end
 
-
-function iam_delete_user(aws::AWSConfig, user_name)
+#=
+function iam_delete_user(aws, user_name)
 
     r = iam(aws, "ListUserPolicies", Dict("UserName" => user_name))
 #    for {- policy} in 
@@ -122,6 +125,7 @@ function iam_format_policy(policy_statement)
 #    json [dict create Version 2012-10-17 Statement $policy_statement]
 end
 
+=#
 
 function iam_create_role(aws::AWSConfig, name; path="/")
 
