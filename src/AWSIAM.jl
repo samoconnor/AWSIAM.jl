@@ -29,9 +29,9 @@ user_arn(aws::AWSConfig, user_name) = arn(aws, "iam", "user/$user_name")
 
 function iam(aws::AWSConfig; args...)
 
-    aws = merge(aws, region = "us-east-1")
+    aws = merge(aws, @SymDict(region = "us-east-1"))
 
-    query = StringDict(args)
+    query = stringdict(args)
     query["ContentType"] = "JSON"
 
     @repeat 4 try
@@ -46,7 +46,7 @@ end
 
 function sts(aws::AWSConfig; args...)
 
-    query = StringDict(args)
+    query = stringdict(args)
     query["ContentType"] = "JSON"
 
     do_request(post_request(aws, "sts", "2011-06-15", query))
