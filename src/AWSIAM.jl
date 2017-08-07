@@ -27,16 +27,11 @@ role_arn(aws::AWSConfig, role_name) = arn(aws, "iam", "role/$role_name")
 user_arn(aws::AWSConfig, user_name) = arn(aws, "iam", "user/$user_name")
 
 
-function iam(aws::AWSConfig; args...)
-
-    aws = merge(aws, @SymDict(region = "us-east-1"))
-
-    query = stringdict(args)
-    query["ContentType"] = "JSON"
+function iam(aws::AWSConfig; Action="", args...)
 
     @repeat 4 try
 
-        return do_request(post_request(aws::AWSConfig, "iam", "2010-05-08", query))
+        AWSCore.Services.iam(aws, Action, stringdict(args))
 
     catch e
         @retry if e.code == "NoSuchEntity" end
@@ -44,12 +39,9 @@ function iam(aws::AWSConfig; args...)
 end
 
 
-function sts(aws::AWSConfig; args...)
+function sts(aws::AWSConfig; Action="", args...)
 
-    query = stringdict(args)
-    query["ContentType"] = "JSON"
-
-    do_request(post_request(aws, "sts", "2011-06-15", query))
+    AWSCore.Services.sts(aws, Action, stringdict(args))
 end
 
 
