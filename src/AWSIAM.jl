@@ -34,7 +34,7 @@ function iam(aws::AWSConfig; Action="", args...)
         AWSCore.Services.iam(aws, Action, stringdict(args))
 
     catch e
-        @retry if e.code == "NoSuchEntity" end
+        @retry if ecode(e) == "NoSuchEntity" end
     end
 end
 
